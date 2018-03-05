@@ -4,6 +4,7 @@ Rex::Vagrant - Easily interact with your Vagrant boxes through Rex.
 
 # SYNOPSIS
 
+```perl
   # Creates an environment named "vagrant" with the correct ssh auth for each
   # vagrant box in your Vagrantfile. When the environment is called, creates
   # one group per vagrant host and a group named "all" that contains all
@@ -27,6 +28,7 @@ Rex::Vagrant - Easily interact with your Vagrant boxes through Rex.
   use Rex::Vagrant;
   Rex::Vagrant->setup_groups( all => "all-my-vagrant-boxes" );
   Rex::Vagrant->setup_environment( name => "my-vagrant-env" );
+```
 
 # DESCRIPTION
 
