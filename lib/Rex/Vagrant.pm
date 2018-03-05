@@ -25,8 +25,8 @@ sub import {
 }
 
 sub ssh_config {
-  my ( $class, $refetch ) = @_;
-  if ( $refetch || !defined $VAGRANT_SSH_CONFIG_FOR ) {
+  my ( $class, %opt ) = @_;
+  if ( $opt{refetch} || !defined $VAGRANT_SSH_CONFIG_FOR ) {
     my @cfg = `vagrant ssh-config`;
     die "failed to obtain vagrant ssh-config!" unless $? == 0;
     $VAGRANT_SSH_CONFIG_FOR = { Rex::Config->_parse_ssh_config(@cfg) };
