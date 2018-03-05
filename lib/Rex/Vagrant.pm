@@ -9,16 +9,18 @@ our $VERSION = '0.01';
 our $VAGRANT_SSH_CONFIG_FOR;
 
 sub import {
-  my ( $class, $what, $addition ) = @_;
-  $what =~ s/^-//;
+  my ( $class, @opts ) = @_;
 
-  if ( $what =~ /^env(ironment)?$/ ) {
-    $addition //= "vagrant";
-    $class->setup_environment($addition);
-  }
-  elsif ( $what eq "groups" ) {
-    $class->setup_ssh_config;
-    $class->setup_groups;
+  while ( my $feature = shift @opts ) {
+    $feature =~ s/^-//;
+    my $feature_opts = ref $opts[0] eq "HASH" ? shift @opts : {};
+    if ( $feature =~ qr/^env(ironment)?$/ ) {
+      $class->setup_environment(%$feature_opts);
+    }
+    elsif ( $feature =~ qr/^groups$/ ) {
+      $class->setup_ssh_config;
+      $class->setup_groups(%$feature_opts);
+    }
   }
 }
 
@@ -46,18 +48,27 @@ sub setup_ssh_config {
 }
 
 sub setup_groups {
-  my $class      = shift;
+  my ( $class, %opt ) = @_;
   my $ssh_config = $class->ssh_config;
+
+  # Create the group with all hosts
+  # Dont create the group if { all => undef } is supplied.
+  if ( !exists $opt{all} || defined $opt{all} ) {
+    my $name = $opt{all} || "all";
+    group $name => keys %{$ssh_config};
+  }
+
+  # create group for each host
   group $_ => $_ for keys %{$ssh_config};
-  group "all" => keys %{$ssh_config};
 }
 
 sub setup_environment {
-  my ( $class, $env_name ) = @_;
-  environment $env_name => sub {
-
+  my ( $class, %opt ) = @_;
+  my $name = $opt{name} // "vagrant";
+  my $group_opts = $opt{groups} // {};
+  environment $name => sub {
     $class->setup_ssh_config;
-    $class->setup_groups;
+    $class->setup_groups( %{$group_opts} );
   };
 }
 
@@ -68,15 +79,37 @@ __END__
 
 =head1 NAME
 
-Rex::Vagrant - Blah blah blah
+Rex::Vagrant - Easily add your Vagrant boxes to your Rexfile.
 
 =head1 SYNOPSIS
 
+  # Creates an environment named "vagrant" with the correct ssh auth for each
+  # vagrant box in your Vagrantfile. When the environment is called, creates
+  # one group per vagrant host and a group named "all" that contains all
+  # vagrant host(s).
+  use Rex::Vagrant -env;
+
+  # Same as above but customize the environment name and the "all" group name
+  use Rex::Vagrant -env =>
+    { name => "my-env", groups => { all => "all-my-vagrant-boxes" } };
+
+  # Create groups and correct auth for all vagrant hosts directly without using
+  # an environment. This makes interacting with rex slow because it has to
+  # obtain the vagrant ssh-config each time you run rex. To solve this, use an
+  # environment instead.
+  use Rex::Vagrant -groups;
+
+  # Same as above but name the "all" group something else.
+  use Rex::Vagrant -groups => { all => "all-my-vagrant-boxes" };
+
+  # Instead of using import options, you can just call the class methods directly:
   use Rex::Vagrant;
+  Rex::Vagrant->setup_groups( all => "all-my-vagrant-boxes" );
+  Rex::Vagrant->setup_environment( name => "my-vagrant-env" );
 
 =head1 DESCRIPTION
 
-Rex::Vagrant is
+Rex::Vagrant is a module that makes it easy to interact with virtual machines created by Vagrant directly in Rex.
 
 =head1 AUTHOR
 
