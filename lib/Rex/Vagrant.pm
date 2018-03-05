@@ -79,7 +79,7 @@ __END__
 
 =head1 NAME
 
-Rex::Vagrant - Easily add your Vagrant boxes to your Rexfile.
+Rex::Vagrant - Easily interact with your Vagrant boxes through Rex.
 
 =head1 SYNOPSIS
 
