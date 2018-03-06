@@ -1,5 +1,5 @@
 {
-   "abstract" : "Blah blah blah",
+   "abstract" : "Easily interact with your Vagrant boxes through Rex.",
    "author" : [
       "Mitch Broadhead <mitch.broadhead@gmail.com>"
    ],
@@ -48,6 +48,17 @@
       }
    },
    "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mbroadhead/rex-vagrant/issues"
+      },
+      "homepage" : "https://github.com/mbroadhead/rex-vagrant",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mbroadhead/rex-vagrant.git",
+         "web" : "https://github.com/mbroadhead/rex-vagrant"
+      }
+   },
    "version" : "0.01",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
